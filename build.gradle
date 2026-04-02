@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+def grpcVersion = '1.80.0'
+def protobufVersion = '3.25.3'
+def tarantoolVersion = '1.5.0'
+
+dependencies {
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+
+    implementation "io.tarantool:tarantool-client:${tarantoolVersion}"
+
+    implementation "org.slf4j:slf4j-simple:2.0.12"
+
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+application {
+    mainClass = 'com.example.kv.Main'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    plugins {
+        grpc {
+            path = "/opt/homebrew/bin/protoc-gen-grpc-java"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                grpc {}
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
